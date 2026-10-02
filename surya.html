@@ -1,0 +1,3168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Solar System</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    background: #000;
+    color: white;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+/* ---------- SPACE ---------- */
+
+.space {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 48%, rgba(255, 153, 0, .07), transparent 24%),
+        radial-gradient(circle at 20% 20%, rgba(91, 82, 255, .06), transparent 25%),
+        #000;
+}
+
+/* subtle moving nebula */
+.space::before,
+.space::after {
+    content: "";
+    position: absolute;
+    inset: -30%;
+    pointer-events: none;
+    opacity: .35;
+    filter: blur(70px);
+}
+
+.space::before {
+    background:
+        radial-gradient(ellipse at 30% 40%, rgba(74, 91, 255, .08), transparent 28%),
+        radial-gradient(ellipse at 70% 65%, rgba(255, 75, 180, .06), transparent 25%);
+    animation: nebula 18s ease-in-out infinite alternate;
+}
+
+.space::after {
+    background:
+        radial-gradient(ellipse at 65% 25%, rgba(255, 180, 60, .05), transparent 25%);
+    animation: nebula 24s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes nebula {
+    from { transform: translate3d(-2%, -1%, 0) scale(1); }
+    to   { transform: translate3d(3%, 2%, 0) scale(1.05); }
+}
+
+/* ---------- STARS ---------- */
+
+.stars,
+.dust {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.star {
+    position: absolute;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background: white;
+    opacity: var(--opacity);
+    box-shadow: 0 0 calc(var(--size) * 3) rgba(255,255,255,.8);
+    animation: twinkle var(--duration) ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+    from { opacity: calc(var(--opacity) * .25); transform: scale(.7); }
+    to   { opacity: var(--opacity); transform: scale(1.25); }
+}
+
+.dust-particle {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    border-radius: 50%;
+    background: rgba(255, 220, 170, .8);
+    opacity: .45;
+    filter: blur(.2px);
+}
+
+/* ---------- TITLE ---------- */
+
+.title {
+    position: absolute;
+    z-index: 20;
+    top: 5vh;
+    width: 100%;
+    text-align: center;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-size: clamp(.68rem, 1vw, .82rem);
+    color: rgba(255,255,255,.62);
+    animation: fadeDown 1.6s ease both;
+}
+
+.title strong {
+    display: block;
+    margin-top: 9px;
+    font-size: clamp(1.15rem, 2.05vw, 1.7rem);
+    letter-spacing: .22em;
+    color: rgba(255,255,255,.92);
+    font-weight: 400;
+}
+
+@keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- SOLAR SYSTEM ---------- */
+
+.solar-system {
+    position: absolute;
+    width: min(94vw, 1120px);
+    height: min(72vw, 760px);
+    left: 50%;
+    top: 47%;
+    transform: translate(-50%, -50%);
+}
+
+/* ---------- ORBITS ---------- */
+
+.orbit {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    border: 1px solid rgba(255,226,190,.16);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) rotate(var(--start-angle));
+    animation: orbit var(--speed) linear infinite;
+    will-change: transform;
+}
+
+.orbit::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border-radius: inherit;
+    border: 1px dashed rgba(255,255,255,.035);
+    pointer-events: none;
+}
+
+@keyframes orbit {
+    from {
+        transform: translate(-50%, -50%) rotate(var(--start-angle));
+    }
+    to {
+        transform: translate(-50%, -50%) rotate(calc(var(--start-angle) + 360deg));
+    }
+}
+
+/* Orbit spacing is visually compressed so all 8 planets fit.
+   Planet diameters are scaled from real solar-system diameter ratios. */
+.o1 { width: 27%; height: 28%; --speed: 0s; }
+.o2 { width: 37%; height: 38%; --speed: 0s; }
+.o3 { width: 47%; height: 48%; --speed: 1s; }
+.o4 { width: 57%; height: 57%; --speed: 0s; }
+.o5 { width: 68%; height: 66%; --speed: 0s; }
+.o6 { width: 79%; height: 74%; --speed: 0s; }
+.o7 { width: 89%; height: 82%; --speed: 0s; }
+.o8 { width: 98%; height: 90%; --speed: 0s; }
+
+/* ---------- PLANETS ---------- */
+
+.planet {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: var(--planet-size);
+    height: var(--planet-size);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f7dfe5;
+    border: 3px solid rgba(255,248,244,.92);
+    box-shadow:
+        0 4px 0 rgba(68,43,52,.20),
+        inset 0 0 0 2px rgba(255,255,255,.22);
+    animation: counterOrbit var(--speed) linear infinite reverse;
+    cursor: pointer;
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+
+@keyframes counterOrbit {
+    from { transform: translate(-50%, -50%) rotate(calc(var(--start-angle) * -1)); }
+    to   { transform: translate(-50%, -50%) rotate(calc((var(--start-angle) + 360deg) * -1)); }
+}
+
+.planet::before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    background: linear-gradient(145deg, rgba(255,255,255,.20), transparent 48%);
+}
+
+.planet::after {
+    content: "♡";
+    position: absolute;
+    z-index: 3;
+    right: 5%;
+    top: 2%;
+    color: rgba(255,255,255,.72);
+    font-size: clamp(9px, .9vw, 13px);
+    line-height: 1;
+    pointer-events: none;
+    text-shadow: none;
+}
+
+.planet:hover {
+    box-shadow:
+        0 5px 0 rgba(68,43,52,.20),
+        inset 0 0 0 2px rgba(255,255,255,.3);
+    z-index: 30;
+    transform: translate(-50%, -50%) scale(1.12);
+}
+
+.planet img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transform: scale(1.06);
+    filter: saturate(1.05) contrast(1.02);
+}
+
+/* tiny label that appears on hover */
+.planet-label {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 9px);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: rgba(10,10,10,.88);
+    border: 1px solid rgba(255,255,255,.15);
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: .08em;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+}
+
+.planet:hover .planet-label {
+    opacity: 1;
+}
+
+/* ---------- SUN ---------- */
+
+.sun-wrap {
+    position: absolute;
+    z-index: 10;
+    left: 50%;
+    top: 50%;
+    width: clamp(145px, 18vw, 210px);
+    height: clamp(145px, 18vw, 210px);
+    transform: translate(-50%, -50%);
+}
+
+.sun-glow {
+    position: absolute;
+    inset: -55%;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle,
+        rgba(255,214,105,.4) 0%,
+        rgba(255,157,35,.18) 27%,
+        rgba(255,104,0,.07) 48%,
+        transparent 70%);
+    animation: sunPulse 3s ease-in-out infinite;
+}
+
+@keyframes sunPulse {
+    0%, 100% { transform: scale(.94); opacity: .8; }
+    50% { transform: scale(1.08); opacity: 1; }
+}
+
+.sun {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(255,225,145,.75);
+    background: #f39a22;
+    box-shadow:
+        0 8px 0 rgba(104,61,28,.18),
+        inset 0 0 0 2px rgba(255,239,188,.25);
+}
+
+.sun img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sun-name {
+    position: absolute;
+    z-index: 15;
+    left: 50%;
+    top: calc(100% + 17px);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-family: Arial, sans-serif;
+    font-size: clamp(.62rem, 1vw, .8rem);
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.8);
+}
+
+/* ---------- CAPTION ---------- */
+
+.caption {
+    position: absolute;
+    z-index: 25;
+    bottom: 7vh;
+    left: 50%;
+    width: min(90%, 800px);
+    transform: translateX(-50%);
+    text-align: center;
+    animation: fadeUp 2s ease 1s both;
+}
+
+.caption-main {
+    font-size: clamp(1rem, 2vw, 1.45rem);
+    line-height: 1.6;
+    font-style: italic;
+    color: rgba(255,255,255,.9);
+}
+
+.caption-sub {
+    margin-top: 10px;
+    font-family: Arial, sans-serif;
+    font-size: .7rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.38);
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 700px) {
+   .solar-system {
+        width: 125vw;
+        height: 125vw;
+        top: 45%;
+    }
+
+    .title {
+        top: 3vh;
+    }
+
+    .caption {
+        bottom: 3vh;
+    }
+
+    .planet {
+        width: var(--planet-size);
+        height: var(--planet-size);
+    }
+
+    .o1 { width: 29%; height: 30%; }
+    .o2 { width: 40%; height: 40%; }
+    .o3 { width: 51%; height: 50%; }
+    .o4 { width: 62%; height: 59%; }
+    .o5 { width: 73%; height: 68%; }
+    .o6 { width: 84%; height: 77%; }
+    .o7 { width: 94%; height: 86%; }
+    .o8 { width: 104%; height: 95%; }
+}
+
+.surprise-btn {
+    margin-top: 18px;
+    padding: 13px 24px;
+    border: 1px solid rgba(255, 220, 150, .5);
+    border-radius: 999px;
+    background: rgba(255, 183, 62, .08);
+    color: rgba(255,255,255,.92);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(.78rem, 1.2vw, .95rem);
+    letter-spacing: .06em;
+    cursor: pointer;
+    box-shadow: 0 0 18px rgba(255,175,45,.08);
+    transition: transform .25s ease, background .25s ease, box-shadow .25s ease;
+}
+
+.surprise-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    background: rgba(255,183,62,.16);
+    box-shadow: 0 0 30px rgba(255,175,45,.22);
+}
+
+.surprise-btn:active {
+    transform: scale(.98);
+}
+
+.surprise-btn:focus-visible {
+    outline: 2px solid rgba(255,220,150,.9);
+    outline-offset: 4px;
+}
+
+
+/* Cute letter styling */
+.letter-inner {
+    position: relative;
+}
+
+.letter-card {
+    position: relative;
+    max-width: 760px;
+    margin: 34px auto 0;
+    padding: clamp(30px, 5vw, 58px);
+    border-radius: 28px;
+    background:
+        radial-gradient(circle at 92% 8%, rgba(243,196,208,.24), transparent 20%),
+        radial-gradient(circle at 8% 92%, rgba(216,205,228,.20), transparent 22%),
+        rgba(255,253,251,.92);
+    border: 1px solid rgba(217,143,167,.18);
+    box-shadow:
+        0 25px 70px rgba(105,65,82,.10),
+        inset 0 0 35px rgba(255,255,255,.75);
+    text-align: left;
+}
+
+.letter-stamp {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(243,196,208,.35);
+    color: #c96f8d;
+    font-size: 22px;
+    transform: rotate(9deg);
+}
+
+.letter-greeting {
+    margin-bottom: 24px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: #b96582;
+}
+
+.letter-card p:not(.letter-greeting):not(.letter-closing):not(.letter-signoff) {
+    margin: 0 0 18px;
+    color: #68525e;
+    font-size: clamp(.98rem, 1.4vw, 1.08rem);
+    line-height: 1.9;
+}
+
+.letter-card em {
+    color: #bd6f89;
+    font-style: normal;
+}
+
+.letter-closing {
+    margin-top: 30px;
+    color: #a95676;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    line-height: 1.4;
+}
+
+.letter-signoff {
+    margin-top: 12px;
+    color: #806b76;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   SOLAR SYSTEM — VINTAGE ORBITAL LAYOUT
+   Inspired by the supplied reference: wide elliptical rings,
+   generous spacing, a dominant photo-sun, and photo-planets.
+   ========================================================= */
+.solar-system {
+    width: min(96vw, 1220px);
+    height: min(78vw, 820px);
+    top: 49%;
+}
+
+/* Wide, increasingly open elliptical paths. The larger paths intentionally
+   extend beyond the central cluster, like a classic illustrated solar chart. */
+.o1 { width: 24%; height: 17%; }
+.o2 { width: 34%; height: 25%; }
+.o3 { width: 45%; height: 33%; }
+.o4 { width: 57%; height: 42%; }
+.o5 { width: 71%; height: 52%; }
+.o6 { width: 88%; height: 64%; }
+.o7 { width: 108%; height: 78%; }
+.o8 { width: 132%; height: 94%; }
+
+/* Clear photographic planets. Sizes are intentionally larger than before
+   so every face remains readable against the wide orbital paths. */
+.o1 .planet { --planet-size: clamp(27px, 2.6vw, 36px); }
+.o2 .planet { --planet-size: clamp(32px, 3vw, 42px); }
+.o3 .planet { --planet-size: clamp(37px, 3.35vw, 47px); }
+.o4 .planet { --planet-size: clamp(41px, 3.7vw, 52px); }
+.o5 .planet { --planet-size: clamp(48px, 4.2vw, 60px); }
+.o6 .planet { --planet-size: clamp(54px, 4.7vw, 67px); }
+.o7 .planet { --planet-size: clamp(59px, 5vw, 72px); }
+.o8 .planet { --planet-size: clamp(53px, 4.6vw, 66px); }
+
+.planet {
+    border: 2px solid rgba(242,211,157,.78);
+    background: #171717;
+    box-shadow: 0 2px 5px rgba(0,0,0,.45),
+                inset 0 0 0 1px rgba(255,255,255,.12);
+}
+
+.planet::before,
+.planet::after {
+    display: none;
+}
+
+.planet img {
+    transform: scale(1.03);
+    filter: saturate(1.02) contrast(1.04);
+}
+
+/* Fine warm-gold lines, closer to the vintage reference image. */
+.orbit {
+    border-color: rgba(232,193,108,.52);
+    border-width: 1px;
+    box-shadow: none;
+}
+
+.orbit::after {
+    display: none;
+}
+
+/* Photo of Surya is the visual anchor, with no artificial halo around it. */
+.sun-wrap {
+    width: clamp(125px, 15vw, 185px);
+    height: clamp(125px, 15vw, 185px);
+}
+
+.sun-glow {
+    display: none;
+}
+
+.sun {
+    border: 2px solid rgba(242,211,157,.85);
+    box-shadow: 0 4px 12px rgba(0,0,0,.5),
+                inset 0 0 0 1px rgba(255,255,255,.15);
+}
+
+@media (min-width: 1200px) {
+    .solar-system {
+        width: min(94vw, 1280px);
+        height: min(72vw, 820px);
+        top: 49%;
+    }
+}
+
+@media (max-width: 900px) {
+    .solar-system {
+        width: 110vw;
+        height: 88vw;
+        top: 48%;
+    }
+
+    .o7 { width: 105%; height: 76%; }
+    .o8 { width: 125%; height: 91%; }
+}
+
+@media (max-width: 600px) {
+    .solar-system {
+        width: 150vw;
+        height: 125vw;
+        top: 46%;
+    }
+
+    .o1 { width: 25%; height: 18%; }
+    .o2 { width: 36%; height: 26%; }
+    .o3 { width: 48%; height: 35%; }
+    .o4 { width: 61%; height: 45%; }
+    .o5 { width: 76%; height: 56%; }
+    .o6 { width: 93%; height: 68%; }
+    .o7 { width: 112%; height: 81%; }
+    .o8 { width: 136%; height: 96%; }
+
+    .sun-wrap {
+        width: 115px;
+        height: 115px;
+    }
+}
+
+</style>
+<style id="photo-integration">
+
+/* =========================================================
+   PHOTO INTEGRATION — BOYFRIEND'S DAY EDITION
+   ========================================================= */
+.cinematic-opening {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    background: #090708 url("images/story-hero.jpg") center 42% / cover no-repeat;
+}
+.cinematic-opening::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+        linear-gradient(180deg, rgba(8,6,8,.80) 0%, rgba(8,6,8,.48) 42%, rgba(8,6,8,.90) 100%),
+        radial-gradient(circle at 50% 48%, rgba(255,190,210,.12), transparent 48%);
+}
+.cinematic-opening::after {
+    content: "";
+    position: absolute;
+    inset: 4%;
+    z-index: -1;
+    border: 1px solid rgba(255,255,255,.12);
+    pointer-events: none;
+}
+.opening-copy { text-shadow: 0 3px 25px rgba(0,0,0,.7); }
+
+/* A quiet memory chapter between the gallery and the letter. */
+.memory-archive {
+    padding: clamp(75px, 9vw, 120px) 24px;
+    background:
+        radial-gradient(circle at 18% 15%, rgba(239,184,201,.13), transparent 27%),
+        radial-gradient(circle at 82% 78%, rgba(216,205,228,.09), transparent 30%),
+        #100b0e;
+    color: #f9edf2;
+}
+.memory-heading {
+    width: min(100%, 980px);
+    margin: 0 auto 48px;
+    text-align: center;
+}
+.memory-heading span {
+    font: 9px Arial, sans-serif;
+    letter-spacing: .28em;
+    color: #dba7b9;
+}
+.memory-heading h2 {
+    margin: 12px 0 0;
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    font-weight: 400;
+    letter-spacing: -.04em;
+}
+.memory-heading p {
+    max-width: 620px;
+    margin: 18px auto 0;
+    color: rgba(255,255,255,.58);
+    line-height: 1.8;
+}
+.memory-grid {
+    width: min(100%, 980px);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: clamp(14px, 2.2vw, 26px);
+    align-items: stretch;
+}
+.memory-card {
+    position: relative;
+    margin: 0;
+    min-height: 280px;
+    overflow: hidden;
+    background: #21171c;
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow: 0 20px 55px rgba(0,0,0,.35);
+    transform: rotate(var(--tilt));
+    transition: transform .45s ease, box-shadow .45s ease;
+}
+.memory-card:hover {
+    transform: rotate(0deg) translateY(-7px) scale(1.015);
+    box-shadow: 0 28px 65px rgba(0,0,0,.48);
+}
+.memory-card img {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    display: block;
+    object-fit: cover;
+}
+.memory-card figcaption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 46px 17px 16px;
+    background: linear-gradient(transparent, rgba(0,0,0,.82));
+    font: italic 15px Georgia, serif;
+    color: #fff8fb;
+}
+.memory-card.tall { grid-row: span 2; min-height: 580px; }
+.memory-card.tall img { min-height: 580px; }
+.memory-card.flower img { object-position: 50% 42%; }
+.memory-card.screenshot img { object-position: center; }
+.memory-archive .continue-btn { display:block; margin:55px auto 0; }
+
+/* More visual breathing around the expanded gallery. */
+.polaroid-gallery { padding-bottom: 105px; }
+.polaroid-wall { margin-bottom: 70px; }
+
+@media (max-width: 700px) {
+    .cinematic-opening { background-position: 54% center; }
+    .memory-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 13px; }
+    .memory-card, .memory-card.tall { min-height: 230px; grid-row: auto; }
+    .memory-card img, .memory-card.tall img { min-height: 230px; }
+    .memory-card:nth-child(1) { grid-column: span 2; }
+    .memory-card:nth-child(1), .memory-card:nth-child(1) img { min-height: 320px; }
+}
+@media (max-width: 430px) {
+    .memory-grid { grid-template-columns: 1fr 1fr; }
+    .memory-card, .memory-card.tall { min-height: 205px; }
+    .memory-card img, .memory-card.tall img { min-height: 205px; }
+    .memory-card:nth-child(1), .memory-card:nth-child(1) img { min-height: 275px; }
+}
+
+</style>
+</head>
+
+<body>
+
+<section class="space">
+
+    <div class="stars" id="stars"></div>
+    <div class="dust" id="dust"></div>
+
+    <div class="title">
+        THE VAISHNAVI SOLAR SYSTEM
+        <strong>where apparently everything revolves around Surya</strong>
+    </div>
+
+    <div class="solar-system">
+
+        <!-- 8 ORBITS / 8 PLANETS -->
+        <div class="orbit o1" style="--start-angle:12deg; --speed:16s;">
+            <div class="planet" style="--planet-size:clamp(42.5px,4vw,60px)">
+                <img src="images/me1.jpg" alt="Sleepy me">
+                <span class="planet-label">SLEEPY ME</span>
+            </div>
+        </div>
+
+        <div class="orbit o2" style="--start-angle:58deg; --speed:19s;">
+            <div class="planet" style="--planet-size:clamp(50px,4.625vw,67.5px)">
+                <img src="images/me2.jpg" alt="Silly me">
+                <span class="planet-label">SILLY ME</span>
+            </div>
+        </div>
+
+        <div class="orbit o3" style="--start-angle:112deg; --speed:23s;">
+            <div class="planet" style="--planet-size:clamp(55px,5.125vw,75px)">
+                <img src="images/me3.jpg" alt="Dramatic me">
+                <span class="planet-label">DRAMATIC ME</span>
+            </div>
+        </div>
+
+        <div class="orbit o4" style="--start-angle:166deg; --speed:27s;">
+            <div class="planet" style="--planet-size:clamp(52.5px,4.875vw,71.25px)">
+                <img src="images/me4.jpg" alt="Annoying me">
+                <span class="planet-label">ANNOYING ME</span>
+            </div>
+        </div>
+
+        <div class="orbit o5" style="--start-angle:214deg; --speed:32s;">
+            <div class="planet" style="--planet-size:clamp(72.5px,6.25vw,90px)">
+                <img src="images/me5.jpg" alt="Loving me">
+                <span class="planet-label">LOVING ME</span>
+            </div>
+        </div>
+
+        <div class="orbit o6" style="--start-angle:248deg; --speed:37s;">
+            <div class="planet" style="--planet-size:clamp(67.5px,5.875vw,85px)">
+                <img src="images/me6.jpg" alt="Clingy me">
+                <span class="planet-label">CLINGY ME</span>
+            </div>
+        </div>
+
+        <div class="orbit o7" style="--start-angle:302deg; --speed:43s;">
+            <div class="planet" style="--planet-size:clamp(62.5px,5.375vw,80px)">
+                <img src="images/me7.jpg" alt="Crazy me">
+                <span class="planet-label">CRAZY ME</span>
+            </div>
+        </div>
+
+        <div class="orbit o8" style="--start-angle:338deg; --speed:49s;">
+            <div class="planet" style="--planet-size:clamp(57.5px,5vw,75px)">
+                <img src="images/me8.jpg" alt="Loving you me">
+                <span class="planet-label">LOVING YOU ME</span>
+            </div>
+        </div>
+
+        <!-- SURYA / SUN -->
+        <div class="sun-wrap">
+            <div class="sun-glow"></div>
+            <div class="sun">
+                <img src="images/surya.jpg" alt="Surya">
+            </div>
+            <div class="sun-name">SURYA ☀</div>
+        </div>
+
+    </div>
+
+    <div class="caption">
+        <div class="caption-main">
+            “Apparently I have 8 different personalities...
+            and somehow all of them revolve around you.”
+        </div>
+
+        <button class="surprise-btn" id="surpriseBtn" type="button">
+            ✨ A surprise is waiting for you ✨
+        </button>
+    </div>
+
+
+    <!-- =========================================================
+         SURPRISE REVEAL
+         ========================================================= -->
+
+    <div class="surprise-stage" id="surpriseStage" aria-hidden="true">
+        <div class="cursive-dream" aria-hidden="true">
+            <span style="--x:4%;--y:8%;--r:-8deg;--s:1.0">you & me</span>
+            <span style="--x:72%;--y:6%;--r:7deg;--s:.9">my favourite person</span>
+            <span style="--x:18%;--y:24%;--r:-4deg;--s:.8">rainy days</span>
+            <span style="--x:78%;--y:27%;--r:11deg;--s:1.1">hold my hand</span>
+            <span style="--x:6%;--y:45%;--r:5deg;--s:.75">little moments</span>
+            <span style="--x:67%;--y:43%;--r:-9deg;--s:.85">midnight walks</span>
+            <span style="--x:28%;--y:66%;--r:8deg;--s:.95">home</span>
+            <span style="--x:83%;--y:69%;--r:-5deg;--s:.8">always you</span>
+            <span style="--x:8%;--y:84%;--r:-7deg;--s:1.05">my safe place</span>
+            <span style="--x:62%;--y:88%;--r:6deg;--s:.9">our little universe</span>
+            <span style="--x:38%;--y:13%;--r:4deg;--s:.65">laughing</span>
+            <span style="--x:45%;--y:78%;--r:-11deg;--s:.7">one more memory</span>
+        </div>
+        <button class="close-surprise" id="closeSurprise" type="button" aria-label="Close surprise">×</button>
+
+        <div class="reveal-instruction" id="revealInstruction">
+            <span>A little box of us is waiting for you</span>
+            <small>click the lid</small>
+        </div>
+
+        <!-- OUTER GIFT -->
+        <div class="gift-scene" id="outerGift">
+            <div class="gift-shadow"></div>
+
+            <div class="gift-box outer-box">
+                <div class="gift-base">
+                    <div class="gift-face gift-front"><img src="images/us1.jpg" alt="Us"></div>
+                    <div class="gift-face gift-right"><img src="images/us2.jpg" alt="Us"></div>
+                    <div class="gift-face gift-back"><img src="images/us3.jpg" alt="Us"></div>
+                    <div class="gift-face gift-left"><img src="images/us4.jpg" alt="Us"></div>
+                    <div class="gift-floor"></div>
+                </div>
+
+                <button class="gift-lid" id="outerLid" type="button" aria-label="Open the gift">
+                    <span class="lid-ribbon"></span>
+                    <span class="lid-bow">♡</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- INNER GIFT -->
+        <div class="inner-gift-scene" id="innerGift">
+            <div class="gift-box inner-box">
+                <div class="gift-base">
+                    <div class="gift-face gift-front"><img src="images/us5.jpg" alt="Us"></div>
+                    <div class="gift-face gift-right"><img src="images/us6.jpg" alt="Us"></div>
+                    <div class="gift-face gift-back"><img src="images/us7.jpg" alt="Us"></div>
+                    <div class="gift-face gift-left"><img src="images/us8.jpg" alt="Us"></div>
+                    <div class="gift-floor"></div>
+                </div>
+
+                <button class="gift-lid" id="innerLid" type="button" aria-label="Open the inner gift">
+                    <span class="lid-ribbon"></span>
+                    <span class="lid-bow">♡</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SINGLE LARGE FLOWER REVEAL -->
+        <button class="peony-stage" id="peonyStage" type="button" aria-label="Open the flower">
+            <span class="peony-glow"></span>
+
+            <span class="single-flower" aria-hidden="true">
+                <span class="petal-ring ring-outer">
+                    <span class="large-petal lp1"></span><span class="large-petal lp2"></span>
+                    <span class="large-petal lp3"></span><span class="large-petal lp4"></span>
+                    <span class="large-petal lp5"></span><span class="large-petal lp6"></span>
+                    <span class="large-petal lp7"></span><span class="large-petal lp8"></span>
+                    <span class="large-petal lp9"></span><span class="large-petal lp10"></span>
+                    <span class="large-petal lp11"></span><span class="large-petal lp12"></span>
+                </span>
+
+                <span class="petal-ring ring-inner">
+                    <span class="inner-petal ip1"></span><span class="inner-petal ip2"></span>
+                    <span class="inner-petal ip3"></span><span class="inner-petal ip4"></span>
+                    <span class="inner-petal ip5"></span><span class="inner-petal ip6"></span>
+                    <span class="inner-petal ip7"></span><span class="inner-petal ip8"></span>
+                </span>
+
+                <span class="flower-heart">❤️</span>
+            </span>
+
+            <span class="peony-note">for you ♡</span>
+        </button>
+    </div>
+
+    <!-- =========================================================
+         FINAL WEBSITE
+         ========================================================= -->
+
+    <main class="final-site" id="finalSite" aria-hidden="true">
+        <div class="cursive-dream final-dream" aria-hidden="true">
+            <span style="--x:2%;--y:7%;--r:-8deg;--s:.9">dear you</span>
+            <span style="--x:74%;--y:9%;--r:6deg;--s:1">the way you smile</span>
+            <span style="--x:12%;--y:31%;--r:5deg;--s:.75">our silly fights</span>
+            <span style="--x:80%;--y:35%;--r:-7deg;--s:.9">you feel like home</span>
+            <span style="--x:4%;--y:58%;--r:-4deg;--s:.8">I choose you</span>
+            <span style="--x:74%;--y:61%;--r:8deg;--s:.85">still counting</span>
+            <span style="--x:18%;--y:79%;--r:7deg;--s:1">all the little things</span>
+            <span style="--x:68%;--y:87%;--r:-6deg;--s:.75">to be continued</span>
+        </div>
+
+        <section class="cinematic-opening final-section" id="cinematicOpening">
+            <div class="film-grain"></div>
+            <div class="opening-copy">
+                <div class="opening-kicker">A FILM BY VAISHNAVI</div>
+                <h1>For the boy<br><em>who became my favourite story.</em></h1>
+                <p>Somewhere between the rain, the laughter, the stupid fights and the little moments... there was us.</p>
+                <button class="continue-btn" type="button" data-next="userManual">continue ↓</button>
+            </div>
+        </section>
+
+        <section class="user-manual final-section" id="userManual">
+            <div class="manual-paper">
+                <div class="manual-kicker">CLASSIFIED DOCUMENT</div>
+                <h2>SURYA™</h2>
+                <p class="manual-model">MODEL: MY FAVOURITE HUMAN</p>
+
+                <div class="manual-grid">
+                    <div><b>PRIMARY FUNCTION</b><span>Making one particular girl ridiculously happy.</span></div>
+                    <div><b>POWER SOURCE</b><span>Food, hugs, attention & apparently shawarma.</span></div>
+                    <div><b>SPECIAL FEATURE</b><span>Big Guy Voice™ activated during silly fights.</span></div>
+                    <div><b>KNOWN BUG</b><span>Annoys girlfriend → gets forgiven anyway.</span></div>
+                    <div><b>EMERGENCY MODE</b><span>Deploy shoulder immediately.</span></div>
+                    <div><b>WARNING</b><span>May cause permanent attachment.</span></div>
+                </div>
+
+                <button class="continue-btn dark" type="button" data-next="polaroidGallery">next chapter →</button>
+            </div>
+        </section>
+
+        <section class="polaroid-gallery final-section" id="polaroidGallery">
+            <div class="gallery-heading">
+                <span>THE LITTLE ARCHIVE</span>
+                <h2>pieces of us.</h2>
+            </div>
+
+            <div class="polaroid-wall">
+                <figure class="polaroid p-a"><img src="images/us1.jpg" alt="Us together"><figcaption>our kind of chaos</figcaption></figure>
+                <figure class="polaroid p-b"><img src="images/us2.jpg" alt="Us together"><figcaption>the little looks</figcaption></figure>
+                <figure class="polaroid p-c"><img src="images/us3.jpg" alt="Us together"><figcaption>somewhere between silly & sweet</figcaption></figure>
+                <figure class="polaroid p-d"><img src="images/us4.jpg" alt="Us together"><figcaption>just us</figcaption></figure>
+                <figure class="polaroid p-e"><img src="images/us5.jpg" alt="Us together"><figcaption>one more memory</figcaption></figure>
+                <figure class="polaroid p-f"><img src="images/us6.jpg" alt="Us together"><figcaption>my favourite kind of ordinary</figcaption></figure>
+            </div>
+
+            <button class="continue-btn dark" type="button" data-next="memoryArchive">there's one more thing →</button>
+        </section>
+
+        <section class="memory-archive final-section" id="memoryArchive">
+            <div class="memory-heading">
+                <span>THE LITTLE THINGS</span>
+                <h2>the moments that stay.</h2>
+                <p>Not every favourite memory needs a perfect photograph. Sometimes it is a shadow on a road, two pairs of shoes, a bunch of flowers, or a quiet meal with your hand finding mine.</p>
+            </div>
+
+            <div class="memory-grid">
+                <figure class="memory-card tall" style="--tilt:-1.2deg"><img src="images/memory1.jpg" alt="Red balloons and photo strips"><figcaption>the kind of surprise that made an ordinary night feel special.</figcaption></figure>
+                <figure class="memory-card" style="--tilt:1.4deg"><img src="images/memory2.jpg" alt="Our shadows on a road"><figcaption>walking beside you, even when all I could photograph was our shadows.</figcaption></figure>
+                <figure class="memory-card" style="--tilt:-1deg"><img src="images/memory3.jpg" alt="Our shoes together"><figcaption>tiny evidence that we were there together.</figcaption></figure>
+                <figure class="memory-card flower" style="--tilt:1.1deg"><img src="images/memory4.jpg" alt="Pink flowers"><figcaption>flowers, because apparently you know exactly what makes me smile.</figcaption></figure>
+                <figure class="memory-card screenshot" style="--tilt:-1.5deg"><img src="images/memory5.jpg" alt="A little shared moment"><figcaption>another tiny piece of our archive.</figcaption></figure>
+                <figure class="memory-card" style="--tilt:1deg"><img src="images/memory6.jpg" alt="A meal and holding hands"><figcaption>good food. your hand. my favourite kind of night.</figcaption></figure>
+            </div>
+
+            <button class="continue-btn dark" type="button" data-next="letter">okay, now read this →</button>
+        </section>
+
+        <section class="chapter letter-section" id="letter">
+    <div class="chapter-inner letter-inner">
+        <p class="chapter-kicker">FOR SURYA · BOYFRIEND'S DAY</p>
+
+        <div class="letter-card">
+            <div class="letter-stamp">♡</div>
+
+            <p class="letter-greeting">Dear Surya,</p>
+
+            <p>
+                I don't think I ever properly told you how happy I am that
+                <em>you</em> became a part of my little world.
+            </p>
+
+            <p>
+                Somewhere between our random conversations, rainy moments,
+                silly little fights, food dates, long drives and all the
+                tiny things in between, you became one of my favourite parts
+                of my days.
+            </p>
+
+            <p>
+                I love the way you make ordinary moments feel special.
+                I love your silly side, your big-guy voice, the way you
+                annoy me just enough to make me laugh, and the way somehow
+                one look from you can make me forget what I was even
+                complaining about.
+            </p>
+
+            <p>
+                And yes, I love your shoulder too. ♡
+                It has somehow become one of my favourite places to be.
+            </p>
+
+            <p>
+                This little website is just my tiny way of putting together
+                some of the things I love about <em>us</em> — the laughs,
+                the chaos, the softness, the random memories and all those
+                moments that make me smile when I think about them.
+            </p>
+
+            <p>
+                Thank you for being you, Surya.
+                Thank you for all the little ways you make my days brighter.
+                And thank you for giving me so many moments worth keeping
+                close to my heart. ♡
+            </p>
+
+            <p class="letter-closing">
+                Happy Boyfriend's Day, my Surya. ❤️
+            </p>
+
+            <p class="letter-signoff">
+                — your girl,<br>
+                Vaishnavi ♡
+            </p>
+        </div>
+
+        <button class="chapter-next" data-next="cinematicOpening">
+            ↺ watch our little story again
+        </button>
+    </div>
+</section>
+    </main>
+</section>
+
+<script>
+/* ---------- GENERATE TINY STARS ---------- */
+
+const stars = document.getElementById("stars");
+const dust = document.getElementById("dust");
+
+for (let i = 0; i < 230; i++) {
+    const star = document.createElement("span");
+    star.className = "star";
+
+    const size = Math.random() * 2.3 + .5;
+    star.style.setProperty("--size", size + "px");
+    star.style.setProperty("--opacity", (Math.random() * .65 + .2).toFixed(2));
+    star.style.setProperty("--duration", (Math.random() * 4 + 2) + "s");
+
+    star.style.left = Math.random() * 100 + "%";
+    star.style.top = Math.random() * 100 + "%";
+    star.style.animationDelay = Math.random() * 5 + "s";
+
+    stars.appendChild(star);
+}
+
+/* ---------- STARDUST ---------- */
+
+for (let i = 0; i < 160; i++) {
+    const particle = document.createElement("span");
+    particle.className = "dust-particle";
+
+    particle.style.left = Math.random() * 100 + "%";
+    particle.style.top = Math.random() * 100 + "%";
+    particle.style.opacity = Math.random() * .45 + .1;
+
+    dust.appendChild(particle);
+}
+
+/* =========================================================
+   SURPRISE REVEAL SEQUENCE
+   ========================================================= */
+
+const surpriseBtn = document.getElementById("surpriseBtn");
+const surpriseStage = document.getElementById("surpriseStage");
+const closeSurprise = document.getElementById("closeSurprise");
+const outerGift = document.getElementById("outerGift");
+const outerLid = document.getElementById("outerLid");
+const innerGift = document.getElementById("innerGift");
+const innerLid = document.getElementById("innerLid");
+const peonyStage = document.getElementById("peonyStage");
+const finalSite = document.getElementById("finalSite");
+const revealInstruction = document.getElementById("revealInstruction");
+
+function openSurprise() {
+    /* Reset the reveal so the whole gift sequence can be replayed. */
+    outerLid.classList.remove("open");
+    innerLid.classList.remove("open");
+    outerGift.querySelector(".gift-box").classList.remove("open");
+    innerGift.querySelector(".gift-box").classList.remove("open");
+    outerGift.classList.remove("opening");
+    innerGift.classList.remove("revealed");
+    peonyStage.classList.remove("revealed", "chosen");
+    revealInstruction.querySelector("span").textContent = "Something special is waiting for you";
+    revealInstruction.querySelector("small").textContent = "click the lid";
+    revealInstruction.style.opacity = "1";
+
+    surpriseStage.classList.add("active");
+    surpriseStage.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+}
+
+function closeSurpriseStage() {
+    surpriseStage.classList.remove("active");
+    surpriseStage.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+}
+
+if (surpriseBtn) surpriseBtn.addEventListener("click", openSurprise);
+if (closeSurprise) closeSurprise.addEventListener("click", closeSurpriseStage);
+
+if (outerLid) {
+    outerLid.addEventListener("click", () => {
+        outerLid.classList.add("open");
+        outerGift.classList.add("opening");
+        outerGift.querySelector(".gift-box").classList.add("open");
+        revealInstruction.style.opacity = "0";
+
+        setTimeout(() => {
+            innerGift.classList.add("revealed");
+            revealInstruction.querySelector("span").textContent = "There is another little piece of us...";
+            revealInstruction.querySelector("small").textContent = "click the inner lid";
+            revealInstruction.style.opacity = "1";
+        }, 1450);
+    });
+}
+
+if (innerLid) {
+    innerLid.addEventListener("click", () => {
+        innerLid.classList.add("open");
+        innerGift.querySelector(".gift-box").classList.add("open");
+
+        revealInstruction.style.opacity = "0";
+
+        setTimeout(() => {
+            peonyStage.classList.add("revealed");
+            revealInstruction.querySelector("span").textContent = "For you, Surya.";
+            revealInstruction.querySelector("small").textContent = "click the flower";
+            revealInstruction.style.opacity = "1";
+        }, 1500);
+    });
+}
+
+if (peonyStage) {
+    peonyStage.addEventListener("click", () => {
+        peonyStage.classList.add("chosen");
+        revealInstruction.style.opacity = "0";
+
+        setTimeout(() => {
+            surpriseStage.classList.remove("active");
+            surpriseStage.setAttribute("aria-hidden", "true");
+            finalSite.classList.add("active");
+            finalSite.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "";
+            document.getElementById("cinematicOpening").scrollIntoView({ behavior: "instant", block: "start" });
+        }, 900);
+    });
+}
+
+/* Final website chapter navigation */
+document.querySelectorAll("[data-next]").forEach(button => {
+    button.addEventListener("click", () => {
+        const id = button.getAttribute("data-next");
+        const target = document.getElementById(id);
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+});
+
+/* Escape closes only the surprise overlay, never the final website. */
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && surpriseStage.classList.contains("active")) {
+        closeSurpriseStage();
+    }
+});
+
+
+/* =========================================================
+   RANDOM PLANET MOTION
+   Every page load gives each planet a different speed and
+   direction while keeping every orbit perfectly circular.
+   ========================================================= */
+(function randomizePlanetMotion() {
+    const baseSpeeds = [16, 19, 23, 27, 32, 37, 43, 49];
+    const orbits = document.querySelectorAll('.solar-system .orbit');
+
+    orbits.forEach((orbit, i) => {
+        const base = baseSpeeds[i] || 30;
+
+        // Random variation: 65% to 140% of the normal speed.
+        // Smaller seconds = faster movement.
+        const speed = base * (0.65 + Math.random() * 0.75);
+        const direction = Math.random() < 0.5 ? 'normal' : 'reverse';
+
+        orbit.style.setProperty('--random-speed', speed.toFixed(2) + 's');
+        orbit.style.setProperty('--orbit-direction', direction);
+        orbit.style.setProperty(
+            '--planet-direction',
+            direction === 'normal' ? 'reverse' : 'normal'
+        );
+    });
+})();
+</script>
+
+
+<style id="random-planet-motion">
+/* RANDOM PLANET MOTION — circular orbits stay fixed, each planet gets its own speed/direction */
+.solar-system .orbit {
+    animation-duration: var(--random-speed) !important;
+    animation-direction: var(--orbit-direction) !important;
+}
+
+.solar-system .planet {
+    animation-duration: var(--random-speed) !important;
+    animation-direction: var(--planet-direction) !important;
+    transform: translate(-50%, -50%) !important;
+}
+</style>
+
+</body>
+</html>
+
+<style>
+@media (prefers-reduced-motion: reduce) {
+    .orbit {
+        animation-play-state: paused !important;
+    }
+    .planet {
+        animation-play-state: paused !important;
+    }
+}
+
+/* =========================================================
+   SURPRISE GIFT REVEAL
+   CAMERA: TRUE TOP-DOWN / ORTHOGRAPHIC-STYLE VIEW
+   Outer box = 0deg rotation in the plane.
+   Inner box = exactly 45deg rotation in the plane.
+   No camera tilt.
+   =========================================================
+   ========================================================= */
+
+.surprise-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 42%, rgba(255,174,115,.10), transparent 22%),
+        radial-gradient(circle at 50% 70%, rgba(255,100,160,.05), transparent 30%),
+        #050304;
+    perspective: none;
+}
+
+.surprise-stage.active {
+    display: flex;
+}
+
+.close-surprise {
+    position: absolute;
+    z-index: 1200;
+    top: 24px;
+    right: 28px;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 50%;
+    background: rgba(0,0,0,.35);
+    color: white;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.reveal-instruction {
+    position: absolute;
+    z-index: 1100;
+    top: 8%;
+    text-align: center;
+    color: rgba(255,255,255,.85);
+    letter-spacing: .08em;
+    animation: revealFloat 2.8s ease-in-out infinite;
+}
+
+.reveal-instruction span {
+    display: block;
+    font-size: clamp(1rem, 2vw, 1.35rem);
+}
+
+.reveal-instruction small {
+    display: block;
+    margin-top: 8px;
+    color: rgba(255,255,255,.38);
+    font: 10px Arial, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: .25em;
+}
+
+@keyframes revealFloat {
+    0%,100% { transform: translateY(0); opacity: .75; }
+    50% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* =========================================================
+   TRUE FOLD-OUT GIFT BOX
+   The box is a square floor with four hinged PHOTO SQUARES.
+   Every side has exactly the same dimensions as the bottom square.
+   Open: the four equal squares fall flat outward, matching the paper template.
+   ========================================================= */
+
+.gift-scene,
+.inner-gift-scene {
+    position: absolute;
+    width: 360px;
+    height: 360px;
+    left: 50%;
+    top: 54%;
+    transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    transform-style: preserve-3d;
+    overflow: visible;
+    transition: opacity 1s ease;
+}
+
+.inner-gift-scene {
+    width: 235px;
+    height: 235px;
+    top: 54%;
+    transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg) rotateZ(45deg);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 30;
+}
+
+.gift-shadow {
+    position: absolute;
+    width: 94%;
+    height: 60%;
+    left: 3%;
+    bottom: -10%;
+    background: rgba(116,73,91,.18);
+    filter: blur(25px);
+    transform: translateZ(-20px);
+}
+
+.gift-box {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+.gift-base {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+}
+
+/* The actual bottom of the gift. */
+.gift-floor {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background:
+        linear-gradient(135deg, rgba(255,255,255,.32), transparent 38%),
+        linear-gradient(145deg, #efbdcc, #d88fa8);
+    border: 1px solid rgba(255,255,255,.78);
+    box-shadow:
+        inset 0 0 35px rgba(116,63,84,.13),
+        0 10px 24px rgba(110,64,82,.10);
+    transform: translateZ(0);
+}
+
+/*
+   Every photo panel is attached to ONE edge of the floor.
+   The hinge is the edge of the panel touching the square.
+*/
+.gift-face {
+    position: absolute;
+    z-index: 5;
+    overflow: hidden;
+    background: linear-gradient(145deg, #efbdcc, #d995ad);
+    border: 1px solid rgba(255,255,255,.82);
+    box-shadow:
+        inset 0 0 22px rgba(112,60,82,.12),
+        inset 0 1px 12px rgba(255,255,255,.35),
+        0 6px 18px rgba(110,64,82,.10);
+    backface-visibility: visible;
+    transition:
+        transform 1.65s cubic-bezier(.18,.82,.22,1),
+        box-shadow 1s ease;
+}
+
+/* Every side is a TRUE SQUARE: exactly the same width and height as the bottom square. */
+.outer-box .gift-face {
+    width: 100%;
+    height: 100%;
+}
+
+/* Inner box sides are also true squares, matching its bottom square exactly. */
+.inner-box .gift-face {
+    width: 100%;
+    height: 100%;
+}
+
+/* FRONT: a full square hinged to the top edge. */
+.outer-box .gift-front,
+.inner-box .gift-front {
+    left: 0;
+    top: -100%;
+    width: 100%;
+    height: 100%;
+    transform-origin: 50% 100%;
+    transform: rotateX(90deg);
+}
+
+/* BACK: a full square hinged to the bottom edge. */
+.outer-box .gift-back,
+.inner-box .gift-back {
+    left: 0;
+    top: 100%;
+    width: 100%;
+    height: 100%;
+    transform-origin: 50% 0%;
+    transform: rotateX(90deg);
+}
+
+/* RIGHT: a full square hinged to the right edge. */
+.outer-box .gift-right,
+.inner-box .gift-right {
+    left: 100%;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    transform-origin: 0% 50%;
+    transform: rotateY(-90deg);
+}
+
+/* LEFT: a full square hinged to the left edge. */
+.outer-box .gift-left,
+.inner-box .gift-left {
+    left: -100%;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    transform-origin: 100% 50%;
+    transform: rotateY(-90deg);
+}
+
+/* When opened, ALL FOUR panels become one flat cross around the floor. */
+
+/* Open-state geometry: the top and bottom photo squares stay fully visible. */
+.gift-box.open .gift-front {
+    top: -100%;
+    left: 0;
+    transform: none !important;
+}
+
+.gift-box.open .gift-back {
+    top: 100%;
+    left: 0;
+    transform: none !important;
+}
+
+.gift-box.open .gift-right {
+    left: 100%;
+    top: 0;
+    transform: none !important;
+}
+
+.gift-box.open .gift-left {
+    left: -100%;
+    top: 0;
+    transform: none !important;
+}
+
+.gift-box.open .gift-floor {
+    z-index: 3;
+}
+
+.gift-box.open .gift-face {
+    transform: none !important;
+    box-shadow:
+        inset 0 0 22px rgba(112,60,82,.12),
+        inset 0 1px 12px rgba(255,255,255,.35),
+        0 10px 22px rgba(110,64,82,.10);
+}
+
+/* The lid starts as a perfect square on top of the floor. */
+.gift-lid {
+    position: absolute;
+    z-index: 20;
+    width: 106%;
+    height: 106%;
+    left: -3%;
+    top: -3%;
+    border: 1px solid rgba(255,255,255,.85);
+    border-radius: 5px;
+    background:
+        linear-gradient(90deg,
+            transparent 44%,
+            rgba(255,247,249,.9) 44%,
+            rgba(255,247,249,.9) 56%,
+            transparent 56%),
+        linear-gradient(0deg,
+            transparent 44%,
+            rgba(255,247,249,.9) 44%,
+            rgba(255,247,249,.9) 56%,
+            transparent 56%),
+        linear-gradient(145deg, #f3c4d0, #d98fa7);
+    box-shadow:
+        0 12px 30px rgba(110,64,82,.16),
+        inset 0 1px 12px rgba(255,255,255,.45);
+    cursor: pointer;
+    transform-origin: center center;
+    transition:
+        transform 1.25s cubic-bezier(.18,.82,.22,1),
+        opacity .7s ease,
+        filter .3s ease;
+    color: rgba(255,255,255,.92);
+}
+
+.gift-lid:hover {
+    filter: brightness(1.04);
+}
+
+/* Lid lifts away instead of simply disappearing. */
+.gift-lid.open {
+    transform: translateY(-18px) scale(.88) rotateZ(0deg);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.lid-ribbon {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg,
+            transparent 44%,
+            rgba(255,247,249,.88) 44%,
+            rgba(255,247,249,.88) 56%,
+            transparent 56%);
+    pointer-events: none;
+}
+
+/* A small real-looking bow instead of the old heart character. */
+.lid-bow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 30px;
+    height: 24px;
+    transform: translate(-50%, -50%);
+    border-radius: 6px;
+    background: linear-gradient(135deg, #d96f8c, #b94d6c);
+    box-shadow: 0 4px 10px rgba(120,55,75,.22);
+    font-size: 0;
+}
+
+.lid-bow::before,
+.lid-bow::after {
+    content: "";
+    position: absolute;
+    top: -9px;
+    width: 44px;
+    height: 32px;
+    border-radius: 70% 25% 65% 30%;
+    background: linear-gradient(135deg, #e7839f, #c95372);
+    box-shadow: inset 0 2px 5px rgba(255,255,255,.25);
+}
+
+.lid-bow::before {
+    right: 19px;
+    transform: rotate(22deg);
+}
+
+.lid-bow::after {
+    left: 19px;
+    transform: scaleX(-1) rotate(22deg);
+}
+
+/* Tiny lift of the box while the panels release. */
+.outer-box.opening {
+    animation: boxLift .8s ease both;
+}
+
+@keyframes boxLift {
+    from { transform: translateY(0) scale(1); }
+    to   { transform: translateY(-7px) scale(1.015); }
+}
+
+/* Inner gift arrives only after the outer four panels are flat. */
+.inner-gift-scene.revealed {
+    opacity: 1;
+    pointer-events: auto;
+    animation: innerArrive 1.4s cubic-bezier(.18,.82,.22,1) both;
+}
+
+@keyframes innerArrive {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -46%) rotateZ(45deg) scale(.72);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) rotateZ(45deg) scale(1);
+    }
+}
+
+/* Single large flower */
+.peony-stage {
+    position: absolute;
+    z-index: 40;
+    left: 50%;
+    top: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%) scale(.08);
+    opacity: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    pointer-events: none;
+    transition: opacity .8s ease, transform 1.5s cubic-bezier(.2,.8,.2,1);
+}
+
+.peony-stage.revealed {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+}
+
+.peony-glow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 82%;
+    height: 82%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, rgba(255,190,210,.25), transparent 48%),
+        radial-gradient(circle, rgba(255,130,175,.10), transparent 72%);
+    animation: peonyGlow 2.4s ease-in-out infinite;
+}
+
+@keyframes peonyGlow {
+    0%,100% { transform: translate(-50%,-50%) scale(.94); opacity: .55; }
+    50% { transform: translate(-50%,-50%) scale(1.06); opacity: .95; }
+}
+
+/* One large flower sized to nearly fill the square */
+.single-flower {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 78%;
+    height: 78%;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 14px 16px rgba(86,30,50,.22));
+}
+
+.petal-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+}
+
+.large-petal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 31%;
+    height: 46%;
+    transform-origin: 50% 88%;
+    border-radius: 58% 42% 60% 40%;
+    background:
+        radial-gradient(circle at 34% 20%, rgba(255,255,255,.62), transparent 12%),
+        linear-gradient(145deg, #ffd9e3 0%, #f2a0ba 46%, #d66c8e 100%);
+    box-shadow:
+        inset 2px 3px 8px rgba(255,255,255,.42),
+        inset -4px -6px 10px rgba(125,38,65,.10),
+        2px 7px 10px rgba(110,35,58,.14);
+}
+
+.lp1  { transform: translate(-50%,-88%) rotate(0deg); }
+.lp2  { transform: translate(-50%,-88%) rotate(30deg); }
+.lp3  { transform: translate(-50%,-88%) rotate(60deg); }
+.lp4  { transform: translate(-50%,-88%) rotate(90deg); }
+.lp5  { transform: translate(-50%,-88%) rotate(120deg); }
+.lp6  { transform: translate(-50%,-88%) rotate(150deg); }
+.lp7  { transform: translate(-50%,-88%) rotate(180deg); }
+.lp8  { transform: translate(-50%,-88%) rotate(210deg); }
+.lp9  { transform: translate(-50%,-88%) rotate(240deg); }
+.lp10 { transform: translate(-50%,-88%) rotate(270deg); }
+.lp11 { transform: translate(-50%,-88%) rotate(300deg); }
+.lp12 { transform: translate(-50%,-88%) rotate(330deg); }
+
+/* Smaller inner petals give it a fuller peony-like center */
+.inner-petal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 24%;
+    height: 35%;
+    transform-origin: 50% 88%;
+    border-radius: 60% 40% 62% 38%;
+    background:
+        radial-gradient(circle at 35% 18%, rgba(255,255,255,.58), transparent 13%),
+        linear-gradient(145deg, #ffe2e9 0%, #efa0b9 52%, #cf6b8b 100%);
+    box-shadow:
+        inset 1px 2px 5px rgba(255,255,255,.38),
+        1px 4px 7px rgba(110,35,58,.13);
+}
+
+.ip1 { transform: translate(-50%,-88%) rotate(0deg); }
+.ip2 { transform: translate(-50%,-88%) rotate(45deg); }
+.ip3 { transform: translate(-50%,-88%) rotate(90deg); }
+.ip4 { transform: translate(-50%,-88%) rotate(135deg); }
+.ip5 { transform: translate(-50%,-88%) rotate(180deg); }
+.ip6 { transform: translate(-50%,-88%) rotate(225deg); }
+.ip7 { transform: translate(-50%,-88%) rotate(270deg); }
+.ip8 { transform: translate(-50%,-88%) rotate(315deg); }
+
+/* Beating heart in the exact center */
+.flower-heart {
+    position: absolute;
+    z-index: 30;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(30px, 11%, 52px);
+    line-height: 1;
+    filter: drop-shadow(0 5px 9px rgba(120,35,65,.25));
+    animation: heartBeat 1.15s ease-in-out infinite;
+}
+
+@keyframes heartBeat {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    14% { transform: translate(-50%, -50%) scale(1.22); }
+    28% { transform: translate(-50%, -50%) scale(1); }
+    42% { transform: translate(-50%, -50%) scale(1.14); }
+    56% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.peony-note {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 2px);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    color: rgba(255,235,240,.9);
+    font: italic 14px Georgia, serif;
+}
+
+/* =========================================================
+   FINAL SITE
+   ========================================================= */
+
+.final-site {
+    position: relative;
+    display: none;
+    z-index: 900;
+    background: #090607;
+    color: #f9eef2;
+}
+
+.final-site.active {
+    display: block;
+}
+
+.final-section {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.cinematic-opening {
+    display: grid;
+    place-items: center;
+    background:
+        linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.72)),
+        radial-gradient(circle at 50% 50%, rgba(164,65,96,.16), transparent 40%),
+        #090607;
+}
+
+.film-grain {
+    position: absolute;
+    inset: 0;
+    opacity: .11;
+    background-image: radial-gradient(rgba(255,255,255,.8) .6px, transparent .7px);
+    background-size: 5px 5px;
+    pointer-events: none;
+}
+
+.opening-copy {
+    position: relative;
+    z-index: 2;
+    width: min(820px, 88%);
+    text-align: center;
+    animation: openingFade 2s ease both;
+}
+
+.opening-kicker,
+.manual-kicker,
+.letter-date,
+.gallery-heading span {
+    font: 10px Arial, sans-serif;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.48);
+}
+
+.opening-copy h1 {
+    margin: 20px 0;
+    font-size: clamp(2.7rem, 7vw, 6.2rem);
+    line-height: .98;
+    font-weight: 400;
+}
+
+.opening-copy h1 em {
+    color: #efb3c5;
+}
+
+.opening-copy p {
+    max-width: 620px;
+    margin: 0 auto;
+    color: rgba(255,255,255,.64);
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+@keyframes openingFade {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.continue-btn {
+    margin-top: 36px;
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 999px;
+    padding: 13px 23px;
+    background: transparent;
+    color: rgba(255,255,255,.86);
+    cursor: pointer;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font: 10px Arial, sans-serif;
+    transition: .3s ease;
+}
+
+.continue-btn:hover {
+    background: rgba(255,255,255,.09);
+    transform: translateY(-2px);
+}
+
+.continue-btn.dark {
+    border-color: rgba(50,20,30,.25);
+    color: #351a25;
+}
+
+.user-manual {
+    display: grid;
+    place-items: center;
+    padding: 70px 20px;
+    background: #eee4d6;
+    color: #24171c;
+}
+
+.manual-paper {
+    width: min(850px, 92%);
+    padding: clamp(30px, 6vw, 65px);
+    background: #f7efe4;
+    border: 1px solid rgba(50,20,30,.13);
+    box-shadow: 0 25px 70px rgba(0,0,0,.18);
+    transform: rotate(-1deg);
+}
+
+.manual-paper h2 {
+    margin-top: 8px;
+    font-size: clamp(3rem, 8vw, 6rem);
+    letter-spacing: -.05em;
+}
+
+.manual-model {
+    font: 10px Arial, sans-serif;
+    letter-spacing: .2em;
+    color: #936277;
+}
+
+.manual-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    margin-top: 40px;
+    border-top: 1px solid rgba(50,20,30,.18);
+}
+
+.manual-grid div {
+    padding: 22px 14px;
+    border-bottom: 1px solid rgba(50,20,30,.18);
+}
+
+.manual-grid div:nth-child(odd) {
+    border-right: 1px solid rgba(50,20,30,.18);
+}
+
+.manual-grid b,
+.manual-grid span {
+    display: block;
+}
+
+.manual-grid b {
+    margin-bottom: 8px;
+    font: 9px Arial, sans-serif;
+    letter-spacing: .18em;
+    color: #a45170;
+}
+
+.manual-grid span {
+    line-height: 1.6;
+    color: #4a3039;
+}
+
+.polaroid-gallery {
+    padding: 100px 30px 80px;
+    background: #171114;
+}
+
+.gallery-heading {
+    text-align: center;
+}
+
+.gallery-heading h2 {
+    margin-top: 12px;
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    font-weight: 400;
+}
+
+.polaroid-wall {
+    width: min(1050px, 96%);
+    margin: 60px auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 38px;
+    align-items: center;
+}
+
+.polaroid {
+    margin: 0;
+    padding: 11px 11px 25px;
+    background: #f7f2e9;
+    color: #2c1d22;
+    box-shadow: 0 18px 35px rgba(0,0,0,.4);
+    transition: transform .35s ease;
+}
+
+.polaroid:hover {
+    transform: rotate(0deg) scale(1.04) translateY(-6px);
+    z-index: 5;
+}
+
+.polaroid img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+}
+
+.polaroid figcaption {
+    padding-top: 12px;
+    text-align: center;
+    font: italic 15px Georgia, serif;
+}
+
+.p-a { transform: rotate(-5deg); }
+.p-b { transform: rotate(3deg); }
+.p-c { transform: rotate(-2deg); }
+.p-d { transform: rotate(5deg); }
+.p-e { transform: rotate(-4deg); }
+.p-f { transform: rotate(2deg); }
+
+.polaroid-gallery .continue-btn {
+    display: block;
+    margin: 30px auto 0;
+    color: #f5e9ee;
+    border-color: rgba(255,255,255,.25);
+}
+
+.letter-section {
+    display: grid;
+    place-items: center;
+    padding: 90px 20px;
+    background:
+        radial-gradient(circle at 50% 20%, rgba(218,106,145,.12), transparent 30%),
+        #0a0708;
+}
+
+.letter-card {
+    width: min(720px, 92%);
+    padding: clamp(35px, 7vw, 75px);
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.025);
+    box-shadow: 0 30px 90px rgba(0,0,0,.45);
+}
+
+.letter-card h2 {
+    margin: 35px 0 28px;
+    font: italic clamp(2rem, 4vw, 3.3rem) Georgia, serif;
+}
+
+.letter-card p {
+    margin: 0 0 22px;
+    color: rgba(255,255,255,.7);
+    font-size: 1rem;
+    line-height: 1.95;
+}
+
+.letter-ending {
+    margin-top: 40px !important;
+    color: #f0afc3 !important;
+    font-size: 1.15rem !important;
+}
+
+.signature {
+    margin-top: 15px;
+    font: italic 1.3rem Georgia, serif;
+    color: rgba(255,255,255,.9);
+}
+
+/* mobile */
+@media (max-width: 700px) {
+    .gift-scene { width: 260px; height: 260px; }
+    .inner-gift-scene { width: 175px; height: 175px; }
+    .gift-front, .gift-back, .gift-right, .gift-left { }
+    .manual-grid { grid-template-columns: 1fr; }
+    .manual-grid div:nth-child(odd) { border-right: 0; }
+    .polaroid-wall { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    .polaroid { padding: 7px 7px 18px; }
+    .polaroid figcaption { font-size: 11px; }
+}
+
+
+/* =========================================================
+   ROMANTIC PASTEL DREAM THEME
+   ========================================================= */
+
+:root {
+    --blush: #f3c4d0;
+    --rose: #d98fa7;
+    --peony: #e8a9bd;
+    --cream: #fff8f3;
+    --milk: #fffdfb;
+    --lavender: #d8cde4;
+    --sage: #cbd8ce;
+    --ink: #513b46;
+    --soft-ink: #806b76;
+}
+
+/* Faded handwritten words throughout the background */
+.cursive-dream {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.cursive-dream span {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    transform: rotate(var(--r)) scale(var(--s));
+    transform-origin: center;
+    white-space: nowrap;
+    color: rgba(132, 91, 108, .075);
+    font-family: "Brush Script MT", "Segoe Script", "Snell Roundhand",
+                 "URW Chancery L", cursive;
+    font-size: clamp(24px, 4vw, 58px);
+    font-weight: 400;
+    letter-spacing: .03em;
+    filter: blur(.15px);
+    user-select: none;
+}
+
+.final-dream {
+    position: fixed;
+    z-index: 0;
+}
+
+/* Surprise overlay */
+.surprise-stage {
+    background:
+        radial-gradient(circle at 50% 38%, rgba(255,218,226,.9), transparent 27%),
+        radial-gradient(circle at 15% 75%, rgba(222,213,235,.55), transparent 27%),
+        radial-gradient(circle at 88% 22%, rgba(207,226,214,.48), transparent 25%),
+        linear-gradient(135deg, #fff9f5 0%, #fdf0f4 45%, #f4eff8 100%);
+    color: var(--ink);
+}
+
+/* Soft floating paper-like light */
+.surprise-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.85), transparent 18%),
+        radial-gradient(circle at 70% 75%, rgba(255,255,255,.7), transparent 20%);
+    mix-blend-mode: screen;
+}
+
+/* Instructions */
+.reveal-instruction {
+    color: rgba(92,61,75,.78);
+    text-shadow: 0 1px 8px rgba(255,255,255,.8);
+}
+
+.reveal-instruction small {
+    color: rgba(112,83,97,.5);
+}
+
+/* Close button */
+.close-surprise {
+    border-color: rgba(118,77,96,.16);
+    background: rgba(255,255,255,.35);
+    color: #765464;
+    box-shadow: 0 5px 20px rgba(100,60,80,.08);
+}
+
+/* Gift shadow */
+.gift-shadow {
+    background: rgba(116,73,91,.18);
+    filter: blur(24px);
+}
+
+/* Pastel gift box */
+.gift-face {
+    background: linear-gradient(145deg, #eab4c5, #d995ad);
+    border-color: rgba(255,255,255,.72);
+    box-shadow:
+        inset 0 0 22px rgba(112,60,82,.12),
+        inset 0 1px 12px rgba(255,255,255,.35);
+}
+
+.gift-floor {
+    background:
+        linear-gradient(135deg, rgba(255,255,255,.42), transparent 38%),
+        linear-gradient(145deg, #e8afc0, #d88fa8);
+    border-color: rgba(255,255,255,.72);
+    box-shadow: inset 0 0 35px rgba(116,63,84,.13);
+}
+
+.gift-lid {
+    border-color: rgba(255,255,255,.8);
+    background:
+        linear-gradient(90deg, transparent 45%, rgba(255,246,247,.85) 45%, rgba(255,246,247,.85) 55%, transparent 55%),
+        linear-gradient(0deg, transparent 45%, rgba(255,246,247,.85) 45%, rgba(255,246,247,.85) 55%, transparent 55%),
+        linear-gradient(135deg, #efbdcc, #d995ad);
+    box-shadow:
+        0 12px 30px rgba(110,64,82,.14),
+        inset 0 1px 12px rgba(255,255,255,.4);
+}
+
+.lid-ribbon {
+    background:
+        linear-gradient(90deg, transparent 45%, rgba(255,245,247,.82) 45%, rgba(255,245,247,.82) 55%, transparent 55%);
+}
+
+.lid-bow {
+    color: rgba(255,255,255,.92);
+    text-shadow: 0 2px 10px rgba(120,70,90,.15);
+}
+
+/* Peony gets softer */
+.peony-glow {
+    background: radial-gradient(circle, rgba(240,155,183,.35), transparent 68%);
+}
+
+.peony-note {
+    color: rgba(100,65,80,.68);
+}
+
+/* Final website pastel palette */
+.final-site {
+    background: var(--cream);
+    color: var(--ink);
+}
+
+.cinematic-opening {
+    background:
+        radial-gradient(circle at 25% 25%, rgba(235,205,217,.65), transparent 27%),
+        radial-gradient(circle at 78% 68%, rgba(213,207,229,.65), transparent 30%),
+        linear-gradient(135deg, #fffaf6, #f9eef2 55%, #f3eff8);
+    color: var(--ink);
+}
+
+.film-grain {
+    opacity: .035;
+    background-image: radial-gradient(rgba(95,62,77,.5) .5px, transparent .7px);
+}
+
+.opening-kicker,
+.manual-kicker,
+.letter-date,
+.gallery-heading span {
+    color: rgba(91,65,78,.46);
+}
+
+.opening-copy h1 {
+    color: #55404a;
+}
+
+.opening-copy h1 em {
+    color: #cc809c;
+}
+
+.opening-copy p {
+    color: rgba(81,60,71,.66);
+}
+
+.continue-btn {
+    border-color: rgba(102,66,82,.2);
+    color: #694b5b;
+    background: rgba(255,255,255,.25);
+}
+
+.continue-btn:hover {
+    background: rgba(255,255,255,.65);
+    box-shadow: 0 8px 25px rgba(120,70,95,.08);
+}
+
+.continue-btn.dark {
+    border-color: rgba(102,66,82,.2);
+    color: #694b5b;
+}
+
+/* User manual becomes a soft handwritten paper */
+.user-manual {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(214,226,215,.45), transparent 22%),
+        radial-gradient(circle at 80% 70%, rgba(229,208,220,.5), transparent 25%),
+        #f8f0e8;
+    color: #4c3741;
+}
+
+.manual-paper {
+    background: rgba(255,252,247,.84);
+    border-color: rgba(120,82,98,.12);
+    box-shadow: 0 25px 70px rgba(105,70,85,.12);
+    backdrop-filter: blur(4px);
+}
+
+.manual-model {
+    color: #ad7088;
+}
+
+.manual-grid {
+    border-color: rgba(100,65,80,.12);
+}
+
+.manual-grid div {
+    border-color: rgba(100,65,80,.12);
+}
+
+.manual-grid b {
+    color: #b56f89;
+}
+
+.manual-grid span {
+    color: #674c58;
+}
+
+/* Polaroid section */
+.polaroid-gallery {
+    background:
+        radial-gradient(circle at 12% 20%, rgba(210,225,215,.48), transparent 24%),
+        radial-gradient(circle at 87% 75%, rgba(232,203,216,.55), transparent 28%),
+        #f7edf0;
+}
+
+.gallery-heading h2 {
+    color: #5d4350;
+}
+
+.polaroid {
+    background: #fffdf9;
+    color: #5a414b;
+    box-shadow: 0 18px 35px rgba(100,63,79,.13);
+}
+
+.polaroid-gallery .continue-btn {
+    color: #694b5b;
+    border-color: rgba(102,66,82,.2);
+}
+
+/* Letter */
+.letter-section {
+    background:
+        radial-gradient(circle at 50% 15%, rgba(242,196,211,.6), transparent 25%),
+        radial-gradient(circle at 15% 80%, rgba(213,225,217,.45), transparent 25%),
+        #fff7f2;
+}
+
+.letter-card {
+    border-color: rgba(117,79,95,.13);
+    background: rgba(255,253,249,.72);
+    box-shadow: 0 30px 80px rgba(100,64,82,.11);
+    backdrop-filter: blur(5px);
+}
+
+.letter-card h2 {
+    color: #654653;
+}
+
+.letter-card p {
+    color: rgba(80,58,69,.72);
+}
+
+.letter-ending {
+    color: #c47794 !important;
+}
+
+.signature {
+    color: #694b5b;
+}
+
+/* Mobile: keep the words very subtle */
+@media (max-width: 700px) {
+    .cursive-dream span {
+        font-size: 25px;
+        color: rgba(132, 91, 108, .055);
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE DESIGN — PHONE / TABLET / DESKTOP
+   ========================================================= */
+
+/* Prevent fixed decorative elements from forcing horizontal overflow. */
+html {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* Fluid typography and spacing */
+:root {
+    --page-pad: clamp(16px, 4vw, 56px);
+    --section-pad: clamp(48px, 8vw, 110px);
+}
+
+/* Main chapters */
+.chapter {
+    min-height: 100svh;
+    padding: var(--section-pad) var(--page-pad);
+}
+
+.chapter-inner {
+    width: min(100%, 1100px);
+    margin-inline: auto;
+}
+
+/* Cinematic opening */
+.cinematic-content {
+    width: min(92vw, 900px);
+}
+
+.cinematic-content h1 {
+    font-size: clamp(2.2rem, 7vw, 6.5rem);
+    line-height: .98;
+}
+
+.cinematic-content p {
+    max-width: min(680px, 90vw);
+    font-size: clamp(.95rem, 1.7vw, 1.2rem);
+}
+
+/* User manual */
+.manual-grid {
+    width: min(100%, 980px);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+    gap: clamp(12px, 2vw, 22px);
+}
+
+.manual-card {
+    min-height: clamp(130px, 16vw, 180px);
+    padding: clamp(18px, 3vw, 30px);
+}
+
+.manual-card h3 {
+    font-size: clamp(.72rem, 1.2vw, .9rem);
+}
+
+.manual-card p {
+    font-size: clamp(.9rem, 1.5vw, 1.05rem);
+}
+
+/* Polaroid gallery */
+.polaroid-grid {
+    width: min(100%, 1050px);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+    gap: clamp(18px, 3vw, 34px);
+}
+
+.polaroid {
+    width: 100%;
+    max-width: 280px;
+    margin-inline: auto;
+}
+
+.polaroid img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+
+/* Letter */
+.letter-card {
+    width: min(100%, 760px);
+    padding: clamp(24px, 5vw, 58px);
+}
+
+.letter-card p:not(.letter-greeting):not(.letter-closing):not(.letter-signoff) {
+    font-size: clamp(.92rem, 1.8vw, 1.08rem);
+    line-height: 1.8;
+}
+
+/* ---------- SURPRISE / GIFT ---------- */
+
+.surprise-stage {
+    width: 100vw;
+    height: 100svh;
+    min-height: 100svh;
+    overflow: hidden;
+    padding: 0;
+}
+
+/* Gift scene scales with viewport instead of overflowing it. */
+.gift-scene {
+    width: min(72vw, 330px);
+    height: min(72vw, 330px);
+    max-width: 330px;
+    max-height: 330px;
+}
+
+.inner-gift-scene {
+    width: min(48vw, 225px);
+    height: min(48vw, 225px);
+    max-width: 225px;
+    max-height: 225px;
+}
+
+/* Keep the square proportions exact at every size. */
+.gift-box,
+.inner-box {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1;
+}
+
+/* Equal square side panels remain square. */
+.outer-box .gift-face,
+.inner-box .gift-face {
+    width: 100%;
+    height: 100%;
+}
+
+/* Photos always fill their square panels without distortion. */
+.gift-face img,
+.gift-face picture,
+.gift-face .face-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Flower stays inside the inner base at every viewport size. */
+.peony-stage {
+    width: min(100%, 225px);
+    height: min(100%, 225px);
+}
+
+.single-flower {
+    width: 78%;
+    height: 78%;
+}
+
+.flower-heart {
+    font-size: clamp(28px, 8vw, 52px);
+}
+
+/* Surprise text */
+.reveal-instruction {
+    width: min(90vw, 700px);
+    padding-inline: 12px;
+    font-size: clamp(.78rem, 2vw, 1rem);
+}
+
+.cursive-dream {
+    overflow: hidden;
+}
+
+/* ---------- TABLET ---------- */
+@media (max-width: 900px) {
+   .solar-system {
+        width: min(92vw, 760px);
+        height: min(92vw, 760px);
+    }
+
+    .title {
+        top: 4vh;
+    }
+
+    .caption {
+        width: min(92vw, 700px);
+        bottom: 4vh;
+    }
+
+    .caption-main {
+        font-size: clamp(.95rem, 2.4vw, 1.3rem);
+    }
+
+    .gift-scene {
+        width: min(68vw, 300px);
+        height: min(68vw, 300px);
+    }
+
+    .inner-gift-scene {
+        width: min(45vw, 205px);
+        height: min(45vw, 205px);
+    }
+}
+
+/* ---------- PHONE ---------- */
+@media (max-width: 600px) {
+    .space {
+        min-height: 100svh;
+    }
+
+   .solar-system {
+        width: 128vw;
+        height: 128vw;
+        max-width: none;
+        max-height: none;
+        top: 47%;
+    }
+
+    .title {
+        top: 24px;
+        padding-inline: 18px;
+        font-size: .58rem;
+        letter-spacing: .16em;
+    }
+
+    .title strong {
+        font-size: clamp(.9rem, 4.5vw, 1.25rem);
+        letter-spacing: .18em;
+    }
+
+    .sun-name {
+        font-size: .55rem;
+        letter-spacing: .16em;
+        top: calc(100% + 11px);
+    }
+
+    .caption {
+        width: calc(100% - 28px);
+        bottom: 18px;
+    }
+
+    .caption-main {
+        font-size: .9rem;
+        line-height: 1.45;
+    }
+
+    .surprise-btn {
+        width: min(92vw, 330px);
+        padding: 12px 18px;
+        font-size: .78rem;
+    }
+
+    /* Gift */
+    .gift-scene {
+        width: min(78vw, 285px);
+        height: min(78vw, 285px);
+    }
+
+    .inner-gift-scene {
+        width: min(51vw, 185px);
+        height: min(51vw, 185px);
+    }
+
+    .gift-face {
+        border-width: 1px;
+    }
+
+    .gift-face img {
+        border-radius: 0;
+    }
+
+    .gift-ribbon {
+        transform-origin: center;
+    }
+
+    .reveal-instruction {
+        top: 8vh;
+        width: calc(100% - 30px);
+        font-size: .72rem;
+        line-height: 1.45;
+    }
+
+    .surprise-close {
+        top: 16px;
+        right: 16px;
+        width: 36px;
+        height: 36px;
+    }
+
+    .peony-stage {
+        width: min(100%, 185px);
+        height: min(100%, 185px);
+    }
+
+    .peony-note {
+        font-size: 12px;
+    }
+
+    /* Chapters */
+    .chapter {
+        min-height: 100svh;
+        padding: 56px 16px;
+    }
+
+    .chapter-kicker {
+        font-size: .62rem;
+        letter-spacing: .16em;
+    }
+
+    .chapter h2 {
+        font-size: clamp(2rem, 11vw, 3.2rem);
+    }
+
+    .chapter p {
+        max-width: 100%;
+    }
+
+    .manual-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .manual-card {
+        min-height: auto;
+    }
+
+    .polaroid-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .polaroid {
+        max-width: none;
+        padding: 8px 8px 18px;
+    }
+
+    .polaroid figcaption {
+        font-size: .68rem;
+    }
+
+    .letter-card {
+        margin-top: 24px;
+        padding: 28px 20px;
+        border-radius: 22px;
+    }
+
+    .letter-stamp {
+        top: 14px;
+        right: 14px;
+        width: 34px;
+        height: 34px;
+        font-size: 18px;
+    }
+
+    .letter-greeting {
+        font-size: 1.9rem;
+        padding-right: 38px;
+    }
+
+    .letter-card p:not(.letter-greeting):not(.letter-closing):not(.letter-signoff) {
+        font-size: .94rem;
+        line-height: 1.72;
+    }
+
+    .letter-closing {
+        font-size: 1.45rem;
+    }
+
+    .letter-signoff {
+        font-size: 1.05rem;
+    }
+}
+
+/* ---------- VERY SMALL PHONES ---------- */
+@media (max-width: 380px) {
+   .solar-system {
+        width: 142vw;
+        height: 142vw;
+    }
+
+    .caption-main {
+        font-size: .82rem;
+    }
+
+    .surprise-btn {
+        font-size: .72rem;
+    }
+
+    .gift-scene {
+        width: min(82vw, calc((100vh - 70px) / 3));
+        height: min(82vw, calc((100vh - 70px) / 3));
+    }
+
+    .inner-gift-scene {
+        width: min(52vw, calc((100vh - 120px) / 3));
+        height: min(52vw, calc((100vh - 120px) / 3));
+    }
+
+    .polaroid-grid {
+        gap: 10px;
+    }
+
+    .letter-card {
+        padding: 24px 17px;
+    }
+}
+
+/* Respect devices that have a short viewport. */
+@media (max-height: 650px) and (min-width: 601px) {
+    .title {
+        top: 18px;
+    }
+
+   .solar-system {
+        width: min(72vh, 760px);
+        height: min(72vh, 760px);
+    }
+
+    .caption {
+        bottom: 16px;
+    }
+}
+
+/* Touch devices don't need hover-only enlargement. */
+@media (hover: none) {
+    .planet:hover {
+        transform: translate(-50%, -50%);
+        box-shadow:
+            0 0 10px rgba(255,255,255,.15),
+            0 0 22px rgba(100,150,255,.08),
+            inset -9px -11px 16px rgba(0,0,0,.58),
+            inset 5px 5px 12px rgba(255,255,255,.12);
+    }
+}
+
+
+/* =========================================================
+   FINAL VISUAL TUNING
+   Balanced on large monitors without sacrificing mobile.
+   ========================================================= */
+
+/* ---------- SOLAR SYSTEM ---------- */
+.solar-system {
+    width: min(78vw, 920px);
+    height: min(78vw, 920px);
+    top: 47%;
+}
+
+/* Wider orbital spacing: extra room around the Sun and between every ring. */
+.o1 { width: 47%; height: 33%; }
+.o2 { width: 61%; height: 45%; }
+.o3 { width: 75%; height: 57%; }
+.o4 { width: 89%; height: 69%; }
+.o5 { width: 104%; height: 81%; }
+.o6 { width: 119%; height: 93%; }
+.o7 { width: 134%; height: 105%; }
+.o8 { width: 149%; height: 117%; }
+
+/* 25% larger photo planets so the faces remain clear on the wider paths. */
+.me1 { --planet-size: clamp(18.75px, 1.8125vw, 26.25px); }
+.me2 { --planet-size: clamp(22.5px, 2.125vw, 31.25px); }
+.me3 { --planet-size: clamp(25px, 2.4375vw, 35px); }
+.me4 { --planet-size: clamp(23.75px, 2.3125vw, 33.75px); }
+.me5 { --planet-size: clamp(50px, 4.75vw, 67.5px); }
+.me6 { --planet-size: clamp(46.25px, 4.375vw, 62.5px); }
+.me7 { --planet-size: clamp(41.25px, 3.9375vw, 56.25px); }
+.me8 { --planet-size: clamp(37.5px, 3.625vw, 52.5px); }
+
+/* Sun reduced to exactly 50% of its previous final size. */
+.sun-wrap {
+    width: clamp(56px, 7.5vw, 90px);
+    height: clamp(56px, 7.5vw, 90px);
+}
+
+/* Keep title/caption subordinate to the solar system. */
+.title {
+    font-size: clamp(.55rem, .8vw, .72rem);
+    top: clamp(22px, 4vh, 42px);
+}
+
+.title strong {
+    font-size: clamp(.95rem, 1.8vw, 1.45rem);
+    letter-spacing: .25em;
+}
+
+.caption {
+    width: min(88vw, 680px);
+    bottom: clamp(18px, 4vh, 42px);
+}
+
+.caption-main {
+    font-size: clamp(.82rem, 1.35vw, 1.08rem);
+    line-height: 1.5;
+}
+
+.caption-sub {
+    font-size: clamp(.55rem, .7vw, .68rem);
+}
+
+/* ---------- SURPRISE SCREEN ---------- */
+.surprise-stage {
+    isolation: isolate;
+}
+
+.reveal-instruction {
+    font-size: clamp(.68rem, 1vw, .86rem);
+    letter-spacing: .08em;
+}
+
+.gift-scene {
+    /* The open cross is three squares tall, so keep one square small enough
+       that the entire top and bottom panels remain inside the viewport. */
+    width: min(29vw, 250px, calc((100vh - 92px) / 3));
+    height: min(29vw, 250px, calc((100vh - 92px) / 3));
+    top: 50%;
+}
+
+.inner-gift-scene {
+    width: min(19vw, 160px, calc((100vh - 150px) / 3));
+    height: min(19vw, 160px, calc((100vh - 150px) / 3));
+    top: 50%;
+}
+
+/* ---------- FINAL SITE TYPOGRAPHY ---------- */
+.chapter {
+    padding-inline: clamp(18px, 4vw, 60px);
+}
+
+.chapter-inner {
+    width: min(100%, 1040px);
+}
+
+.chapter-kicker {
+    font-size: clamp(.58rem, .8vw, .72rem);
+    letter-spacing: .2em;
+}
+
+.chapter h2 {
+    font-size: clamp(2.1rem, 5vw, 4.7rem);
+    line-height: 1;
+}
+
+.chapter p {
+    font-size: clamp(.92rem, 1.3vw, 1.08rem);
+}
+
+/* Cinematic page stays cinematic rather than oversized. */
+.cinematic-content {
+    width: min(88vw, 860px);
+}
+
+.cinematic-content h1 {
+    font-size: clamp(2.2rem, 6vw, 5.8rem);
+}
+
+/* Manual cards stay balanced on wide screens. */
+.manual-grid {
+    width: min(100%, 920px);
+    gap: clamp(12px, 1.7vw, 20px);
+}
+
+.manual-card {
+    min-height: clamp(125px, 13vw, 170px);
+}
+
+/* Gallery gets a controlled maximum instead of stretching. */
+.polaroid-grid {
+    width: min(100%, 920px);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(18px, 2.8vw, 32px);
+}
+
+.polaroid {
+    max-width: 255px;
+}
+
+/* Letter remains readable instead of becoming huge on desktop. */
+.letter-card {
+    width: min(100%, 720px);
+}
+
+.letter-card p:not(.letter-greeting):not(.letter-closing):not(.letter-signoff) {
+    font-size: clamp(.92rem, 1.15vw, 1.04rem);
+}
+
+/* ---------- LARGE SCREENS ---------- */
+@media (min-width: 1200px) {
+   .solar-system {
+        width: min(70vw, 920px);
+        height: min(70vw, 920px);
+    }
+
+    .title {
+        top: 28px;
+    }
+
+    .caption {
+        bottom: 28px;
+    }
+}
+
+/* ---------- TABLET ---------- */
+@media (max-width: 900px) {
+   .solar-system {
+        width: min(88vw, 760px);
+        height: min(88vw, 760px);
+    }
+
+    .sun-wrap {
+        width: clamp(100px, 17vw, 155px);
+        height: clamp(100px, 17vw, 155px);
+    }
+
+    .caption {
+        width: min(90vw, 650px);
+    }
+
+    .gift-scene {
+        width: min(56vw, 250px, calc((100vh - 86px) / 3));
+        height: min(56vw, 250px, calc((100vh - 86px) / 3));
+    }
+
+    .inner-gift-scene {
+        width: min(38vw, 160px, calc((100vh - 145px) / 3));
+        height: min(38vw, 160px, calc((100vh - 145px) / 3));
+    }
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 600px) {
+   .solar-system {
+        width: 124vw;
+        height: 124vw;
+        top: 46%;
+    }
+
+    .sun-wrap {
+        width: clamp(92px, 22vw, 125px);
+        height: clamp(92px, 22vw, 125px);
+    }
+
+    .title {
+        top: 20px;
+        padding-inline: 15px;
+    }
+
+    .title strong {
+        font-size: clamp(.78rem, 4vw, 1.1rem);
+        letter-spacing: .16em;
+    }
+
+    .caption {
+        width: calc(100% - 30px);
+        bottom: 16px;
+    }
+
+    .caption-main {
+        font-size: .78rem;
+    }
+
+    .caption-sub {
+        font-size: .52rem;
+        letter-spacing: .14em;
+    }
+
+    .gift-scene {
+        width: min(72vw, 240px, calc((100vh - 82px) / 3));
+        height: min(72vw, 240px, calc((100vh - 82px) / 3));
+    }
+
+    .inner-gift-scene {
+        width: min(47vw, 155px, calc((100vh - 140px) / 3));
+        height: min(47vw, 155px, calc((100vh - 140px) / 3));
+    }
+
+    .polaroid-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .chapter h2 {
+        font-size: clamp(2rem, 10vw, 3.1rem);
+    }
+}
+
+/* ---------- SHORT DESKTOP WINDOWS ---------- */
+@media (min-width: 601px) and (max-height: 760px) {
+   .solar-system {
+        width: min(65vh, 760px);
+        height: min(65vh, 760px);
+        top: 46%;
+    }
+
+    .title {
+        top: 15px;
+    }
+
+    .caption {
+        bottom: 12px;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .orbit,
+    .planet,
+    .star,
+    .peony-glow,
+    .flower-heart {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
+
+
+/* ---------- CLEAR, CLASSIC SOLAR SYSTEM ---------- */
+/* Wide concentric rings with generous radial separation so every face reads clearly. */
+.solar-system {
+    width: min(84vw, 1000px);
+    height: min(84vw, 1000px);
+    top: 46%;
+}
+
+.o1 { width: 30%; height: 30%; }
+.o2 { width: 50%; height: 50%; }
+.o3 { width: 70%; height: 70%; }
+.o4 { width: 90%; height: 90%; }
+.o5 { width: 110%; height: 110%; }
+.o6 { width: 130%; height: 130%; }
+.o7 { width: 150%; height: 150%; }
+.o8 { width: 170%; height: 170%; }
+
+/* Keep the photo planets large enough to recognize, but compact enough to preserve gaps. */
+.o1 .planet { --planet-size: clamp(30px, 2.8vw, 40px) !important; }
+.o2 .planet { --planet-size: clamp(34px, 3.1vw, 44px) !important; }
+.o3 .planet { --planet-size: clamp(38px, 3.4vw, 48px) !important; }
+.o4 .planet { --planet-size: clamp(40px, 3.6vw, 51px) !important; }
+.o5 .planet { --planet-size: clamp(44px, 3.9vw, 56px) !important; }
+.o6 .planet { --planet-size: clamp(47px, 4.1vw, 60px) !important; }
+.o7 .planet { --planet-size: clamp(45px, 4.0vw, 58px) !important; }
+.o8 .planet { --planet-size: clamp(43px, 3.8vw, 56px) !important; }
+
+/* A clean, subtle ring treatment. */
+.orbit::after {
+    border-color: rgba(255,255,255,.18);
+    border-width: 1px;
+}
+
+@media (min-width: 601px) and (max-height: 760px) {
+    .solar-system {
+        width: min(76vh, 900px);
+        height: min(76vh, 900px);
+        top: 46%;
+    }
+}
+
+@media (max-width: 600px) {
+    .solar-system {
+        width: min(94vw, 600px);
+        height: min(94vw, 600px);
+        top: 45%;
+    }
+
+    .o1 { width: 40%; height: 29%; }
+    .o2 { width: 54%; height: 41%; }
+    .o3 { width: 68%; height: 53%; }
+    .o4 { width: 82%; height: 65%; }
+    .o5 { width: 96%; height: 77%; }
+    .o6 { width: 110%; height: 89%; }
+    .o7 { width: 124%; height: 101%; }
+    .o8 { width: 138%; height: 113%; }
+}
+</style>
